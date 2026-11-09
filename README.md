@@ -39,19 +39,20 @@ La API queda en `http://localhost:3000`. Para empezar con datos limpios, copia `
 
 `/products` está protegido (`routes.json` → 660): sin `Authorization: Bearer <token>` responde 401.
 
-### 1-B. Backend en AWS EC2 (AWS Academy)
+### 1-B. Backend en AWS EC2 (AWS Academy) — despliegue actual
 
-1. En la consola de EC2, abre el **puerto 3000 (TCP)** en el grupo de seguridad de la instancia (regla de entrada, origen `0.0.0.0/0`).
-2. Conéctate a la instancia (**Conectar → EC2 Instance Connect**) y ejecuta:
+La API está desplegada en la instancia **API-MiTiendita** (t3.micro, Amazon Linux 2023, us-east-1) con la **IP elástica `54.174.83.203`**, en el puerto **80**:
 
-   ```bash
-   curl -fsSL https://raw.githubusercontent.com/agdisc11/SH01_Aplicaci-n-CRUD/main/backend/deploy_ec2.sh | bash
-   ```
+- URL de la API: `http://54.174.83.203/`
+- Prueba rápida: `http://54.174.83.203/products` debe responder `"Missing authorization header"` (401), señal de que la API está arriba y protegida.
 
-   El script instala Node.js, descarga el proyecto en `/opt/mitiendita` y deja la API como servicio de systemd (`mitiendita-api`), así vuelve a arrancar sola si la instancia se reinicia.
-3. Prueba desde el navegador `http://<IP-publica>:3000/products`: debe responder `"Missing authorization header"` (401), señal de que la API está arriba y protegida.
+Cómo se creó (por si hay que repetirlo):
 
-En AWS Academy la IP pública cambia cada vez que se reinicia el laboratorio; actualiza `API_BASE_URL` (abajo) cuando eso pase.
+1. **Lanzar instancia:** Amazon Linux 2023, `t3.micro`, par de claves `vockey`, grupo de seguridad con **SSH (22)** y **HTTP (80)** abiertos.
+2. En **Detalles avanzados → Datos de usuario** se pegó el contenido de [`backend/ec2_user_data.sh`](backend/ec2_user_data.sh). Al primer arranque instala Node.js, descarga este repositorio en `/opt/mitiendita` y deja la API como servicio de systemd (`mitiendita-api`), así vuelve a arrancar sola si la instancia se reinicia.
+3. **IP elástica:** se asignó una y se asoció a la instancia, para que la dirección no cambie cuando se reinicia el laboratorio.
+
+El script [`backend/deploy_ec2.sh`](backend/deploy_ec2.sh) también se puede ejecutar a mano en una instancia existente (EC2 Instance Connect o SSH); por defecto usa el puerto 3000 (`PORT=80 bash deploy_ec2.sh` para el 80).
 
 ### 2. App Android
 
@@ -59,8 +60,8 @@ En AWS Academy la IP pública cambia cada vez que se reinicia el laboratorio; ac
 2. La URL de la API se define en `gradle.properties`:
 
    ```properties
-   API_BASE_URL=http://44.222.211.117:3000/   # API en EC2
-   # API_BASE_URL=http://10.0.2.2:3000/       # API local + emulador
+   API_BASE_URL=http://54.174.83.203/        # API en AWS EC2 (IP elástica)
+   # API_BASE_URL=http://10.0.2.2:3000/      # API local + emulador
    ```
 
 3. Con la API en EC2 la app funciona igual en el emulador y en un celular físico (con internet).
