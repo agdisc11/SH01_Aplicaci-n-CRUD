@@ -1,0 +1,13 @@
+{
+  "name": "mi-tiendita-api",
+  "version": "1.0.0",
+  "description": "API REST para la app Mi Tiendita (json-server + json-server-auth)",
+  "private": true,
+  "scripts": {
+    "start": "json-server-auth db.json --port 3000 --host 0.0.0.0 --routes routes.json"
+  },
+  "devDependencies": {
+    "json-server": "0.17.4",
+    "json-server-auth": "2.1.0"
+  }
+}
