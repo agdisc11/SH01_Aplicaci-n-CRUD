@@ -39,11 +39,31 @@ La API queda en `http://localhost:3000`. Para empezar con datos limpios, copia `
 
 `/products` está protegido (`routes.json` → 660): sin `Authorization: Bearer <token>` responde 401.
 
+### 1-B. Backend en AWS EC2 (AWS Academy)
+
+1. En la consola de EC2, abre el **puerto 3000 (TCP)** en el grupo de seguridad de la instancia (regla de entrada, origen `0.0.0.0/0`).
+2. Conéctate a la instancia (**Conectar → EC2 Instance Connect**) y ejecuta:
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/agdisc11/SH01_Aplicaci-n-CRUD/main/backend/deploy_ec2.sh | bash
+   ```
+
+   El script instala Node.js, descarga el proyecto en `/opt/mitiendita` y deja la API como servicio de systemd (`mitiendita-api`), así vuelve a arrancar sola si la instancia se reinicia.
+3. Prueba desde el navegador `http://<IP-publica>:3000/products`: debe responder `"Missing authorization header"` (401), señal de que la API está arriba y protegida.
+
+En AWS Academy la IP pública cambia cada vez que se reinicia el laboratorio; actualiza `API_BASE_URL` (abajo) cuando eso pase.
+
 ### 2. App Android
 
 1. Abre la carpeta del proyecto en Android Studio y sincroniza Gradle.
-2. Ejecuta en un **emulador**: la app usa `http://10.0.2.2:3000/` (la PC vista desde el emulador).
-3. En un **celular físico** (misma red Wi-Fi), cambia `BASE_URL` en `app/build.gradle.kts` por la IP de tu PC, por ejemplo `http://192.168.1.70:3000/`.
+2. La URL de la API se define en `gradle.properties`:
+
+   ```properties
+   API_BASE_URL=http://44.222.211.117:3000/   # API en EC2
+   # API_BASE_URL=http://10.0.2.2:3000/       # API local + emulador
+   ```
+
+3. Con la API en EC2 la app funciona igual en el emulador y en un celular físico (con internet).
 
 El tráfico HTTP sin cifrar solo está permitido en la variante **debug** (`app/src/debug/res/xml/network_security_config.xml`).
 
