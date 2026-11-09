@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// URL de la API: se configura en gradle.properties (API_BASE_URL).
+// Si no está definida se usa la API local vista desde el emulador.
+val apiBaseUrl: String = providers.gradleProperty("API_BASE_URL").getOrElse("http://10.0.2.2:3000/")
+
 android {
     namespace = "com.upchiapas.mitiendita"
     compileSdk {
@@ -19,9 +23,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // URL de la API. 10.0.2.2 = "localhost" de la PC vista desde el emulador.
-        // Si usas un celular físico, cambia por la IP de tu PC en la red (ej. http://192.168.1.70:3000/).
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/\"")
+        buildConfigField("String", "BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {
